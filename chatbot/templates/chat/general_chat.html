@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h2>{% block title %}General Chat{% endblock %}</h2>
+{% endblock %}
+
+{% block content %}
+  <div class="container overflow-scroll position-relative" style="height: 300px;">
+    
+      <div class="position-relative bottom-0">
+        {% for message in session['chat_history'] %}
+          <div class="mt-auto">
+            <p>{{ message['sender']|title }}: {{ message['text'] }}</p>
+          </div>
+        {% endfor %}
+      </div>
+  </div>
+  <form method="post">
+    <dl>
+      {{ form.text_input(autocomplete="off", autofocus="true") }}
+    </dl>
+    <input class="btn btn-primary" type="submit" name="submit_button" value="Send text">
+    <input class="btn btn-outline-secondary" type="submit" name="submit_button" value="Clear chat">
+
+  </form>
+
+
+  <div>
+
+    <div class="list-group">
+      <label class="list-group-item">
+        <input class="form-check-input me-1" type="checkbox" value="">
+        First checkbox
+      </label>
+      <label class="list-group-item">
+        <input class="form-check-input me-1" type="checkbox" value="">
+        Second checkbox
+      </label>
+      <label class="list-group-item">
+        <input class="form-check-input me-1" type="checkbox" value="">
+        Third checkbox
+      </label>
+      <label class="list-group-item">
+        <input class="form-check-input me-1" type="checkbox" value="">
+        Fourth checkbox
+      </label>
+      <label class="list-group-item">
+        <input class="form-check-input me-1" type="checkbox" value="">
+        Fifth checkbox
+      </label>
+    </div>
+  </div>
+
+{% endblock %}

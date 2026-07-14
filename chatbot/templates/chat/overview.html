@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block header %}
+
+<header class="py-5">
+  <div class="container px-5">
+
+
+      <!-- General Chats -->
+      <div class="row gx-5 justify-content-center">
+        <div class="col-lg-12 align-middle">
+          <div class="text-left my-3">
+            <h3 class="display-7 fw-bolder text-dark mb-4">General chats</h3>
+          </div>
+        </div>
+      </div>
+    
+      <!-- General Chats Cards -->
+      <div class="row gx-4 px-0 mb-3 justify-content-center">
+        {% for prompt_key, prompt_data in prompts.items() %}
+          {% if prompt_data['category']=='general_chat' %}
+            <div class="col-lg-4 mb-5 mb-lg-0">
+                <div class="card chat-preview-card text-dark mb-3" style="max-width: 18rem;">
+                  <div class="card-header bg-general-chat-header bg-gradient">{{ prompt_data['category'].replace("_", " ") | title }}</div>
+                  <div class="card-body bg-general-chat-body bg-gradient">
+                    <h5 class="card-title">{{ prompt_data['label'] }}</h5>
+                    <p class="card-text">{{ prompt_data['description_short'] }}</p>
+                    <a href="{{ url_for('chat.chat', chat_scenario=prompt_key) }}" class="stretched-link"></a>
+                  </div>
+                </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+      
+
+
+      <!-- Situation Chats -->
+      <div class="row gx-5 justify-content-center">
+        <div class="col-lg-12 align-middle">
+          <div class="text-left my-3">
+            <h3 class="display-7 fw-bolder text-dark mb-4">Scenarios</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Situation Chats Cards -->
+      <div class="row gx-4 px-0 mb-3 justify-content-center">
+        {% for prompt_key, prompt_data in prompts.items() %}
+          {% if prompt_data['category']=='scenario' %}
+            <div class="col-lg-4 mb-5 mb-lg-0">
+              <div class="card chat-preview-card text-dark mb-3" style="max-width: 18rem;">
+                <div class="card-header bg-scenario-header bg-gradient">Scenario</div>
+                <div class="card-body bg-scenario-body bg-gradient">
+                  <h5 class="card-title">{{ prompt_data['label'] }}</h5>
+                  <p class="card-text">{{ prompt_data['description_short'] }}</p>
+                  <a href="{{ url_for('chat.chat', chat_scenario=prompt_key) }}" class="stretched-link"></a>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <!-- Persona Chats -->
+      <div class="row gx-5 justify-content-center">
+        <div class="col-lg-12 align-middle">
+          <div class="text-left my-3">
+            <h3 class="display-7 fw-bolder text-dark mb-4">Personas</h3>
+            <!-- <p class="lead text-dark mb-4">Your chance to chat with a famous person.</p> -->
+          </div>
+        </div>
+      </div>
+      <!-- Persona Chats Cards -->
+      <div class="row gx-4 px-0 mb-3 justify-content-left">
+        {% for prompt_key, prompt_data in prompts.items() %}
+          {% if prompt_data['category']=='persona' %}
+            <div class="col-lg-4 mb-5 mb-lg-0">
+              <div class="card chat-preview-card text-dark mb-3" style="max-width: 18rem;">
+                <div class="card-header bg-persona-header bg-gradient">Persona</div>
+                <div class="card-body bg-persona-body bg-gradient">
+                  <h5 class="card-title">{{ prompt_data['label'] }}</h5>
+                  <p class="card-text">{{ prompt_data['description_short'] }}</p>
+                  <a href="{{ url_for('chat.chat', chat_scenario=prompt_key) }}" class="stretched-link"></a>
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+  </div>
+</header>
+
+
+
+{% endblock %}

@@ -1,0 +1,209 @@
+html {
+  font-family: Roboto, sans-serif;
+  background: #fff;
+  /* padding: 1rem; */
+}
+
+/* body {
+  max-width: 960px;
+  margin: 0 auto;
+  background: white;
+} */
+
+:root {
+  /* --blue-rgb: 34, 124, 157; */
+  /* --blue-rgb: 94, 94, 255; */
+  /* --blue-rgb: 32, 152, 227; */
+  /* --blue-rgb: 64, 209, 171; */
+  --bs-gray: #6c757d;
+  --bs-gray-dark: #343a40;
+  --bs-gray-100: #f8f9fa;
+  --bs-gray-200: #e9ecef;
+  --bs-gray-300: #dee2e6;
+  --bs-gray-400: #ced4da;
+  --bs-gray-500: #adb5bd;
+  --bs-gray-600: #6c757d;
+  --bs-gray-700: #495057;
+  --bs-gray-800: #343a40;
+  --bs-gray-900: #212529;
+
+  --blue-rgb: 57, 184, 150;
+  --teal-rgb: 23, 195, 178;
+  --yellow-rgb: 255, 203, 119;
+  --cream-rgb: 254, 249, 239;
+  --red-rgb: 254, 109, 115;
+
+  --yellow-sunglow: 255, 203, 60; /* #FFCB33 */
+  --green-mountain-meadow: 57, 184, 150;
+  --red-light-coral: 254, 109, 115;
+  --tiffany-blue: 23, 195, 178;
+
+  /* --primary-rgb: 255, 166, 72; */
+  /* --primary-rgb: 253, 159, 51; */
+  --primary-rgb: var(--yellow-sunglow);
+
+  --general-chat-rgb: var(--yellow-sunglow);
+  --scenario-rgb: var(--red-light-coral);
+  --persona-rgb: var(--tiffany-blue);
+
+  /* --red-rgb: 255, 157, 107; */
+  --bg-card-header-opacity: 0.75;
+  /* --bg-card-body-opacity: 0.7; */
+  --bg-card-body-opacity: 0.1;
+}
+
+/* Overwrite button primary */
+.btn {
+  border-radius: 50rem !important;
+
+  box-shadow: 3px 3px 2px 0px rgba(0, 0, 0, 0.15);
+}
+
+.btn-primary,
+.btn-primary:hover,
+.btn-primary:active,
+.btn-primary:visited {
+  /* Dark text */
+  color: rgba(var(--bs-dark-rgb), var(--bs-text-opacity)) !important;
+  background-color: rgb(var(--primary-rgb)) !important;
+  /* box-shadow: 0 0 0 0.25rem rgb(var(--primary-rgb)) !important; */
+  border-color: rgb(var(--primary-rgb)) !important;
+  /* Pill */
+  border-radius: 50rem !important;
+}
+
+.feature-icon {
+  background-color: rgba(var(--red-light-coral), 1) !important;
+}
+
+/* Chat preview cards */
+.chat-preview-card {
+  border-radius: 20px 20px 20px 20px;
+  box-shadow: 3px 3px 3px 0px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.bg-general-chat-header {
+  /* color: var(--bs-gray-800); */
+  /* background-color: white; */
+  background-color: rgba(
+    var(--general-chat-rgb),
+    var(--bg-card-header-opacity)
+  ) !important;
+}
+
+.bg-general-chat-body {
+  background-color: rgba(
+    var(--general-chat-rgb),
+    var(--bg-card-body-opacity)
+  ) !important;
+}
+
+.bg-scenario-header {
+  background-color: rgba(
+    var(--scenario-rgb),
+    var(--bg-card-header-opacity)
+  ) !important;
+}
+
+.bg-scenario-body {
+  background-color: rgba(
+    var(--scenario-rgb),
+    var(--bg-card-body-opacity)
+  ) !important;
+}
+
+.bg-persona-header {
+  background-color: rgba(
+    var(--persona-rgb),
+    var(--bg-card-header-opacity)
+  ) !important;
+}
+
+.bg-persona-body {
+  background-color: rgba(
+    var(--persona-rgb),
+    var(--bg-card-body-opacity)
+  ) !important;
+}
+
+/* Chat */
+
+chat-online {
+  color: #34ce57;
+}
+
+.chat-offline {
+  color: #e4606d;
+}
+
+.chat-messages {
+  display: flex;
+  flex-direction: column-reverse;
+  max-height: 500px;
+  min-height: 500px;
+  overflow-y: scroll;
+}
+
+.chat-message-left,
+.chat-message-right {
+  display: flex;
+  flex-shrink: 0;
+  max-width: 70%;
+}
+
+.chat-message-left {
+  margin-right: auto;
+}
+
+.chat-message-right {
+  flex-direction: row-reverse;
+  margin-left: auto;
+}
+
+.chat-message-avatar {
+  background-color: var(--bs-gray-100) !important;
+}
+
+.chat-message-text-box-bot {
+  background-color: var(--bs-gray-300) !important;
+  /* top-left | top-right | bottom-right | bottom-left */
+  border-radius: 20px 20px 20px 0;
+}
+
+.chat-message-text-box-user {
+  background-color: rgba(var(--primary-rgb), 1) !important;
+  /* color: white; */
+  color: black;
+  /* top-left | top-right | bottom-right | bottom-left */
+  border-radius: 20px 20px 0 20px;
+}
+
+.chat-text-input-field:focus {
+  border-color: rgba(var(--primary-rgb), 0.8);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset,
+    0 0 8px rgba(var(--primary-rgb), 0.6);
+  outline: 0 none;
+}
+
+#prompt-intro-text {
+  /* position: fixed; Sit on top of the page content */
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.py-3 {
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+}
+.px-4 {
+  padding-right: 1.5rem !important;
+  padding-left: 1.5rem !important;
+}
+.flex-grow-0 {
+  flex-grow: 0 !important;
+}
+.border-top {
+  border-top: 1px solid #dee2e6 !important;
+}
