@@ -62,23 +62,23 @@
         {% endfor %}
       </div>
 
-      <!-- Persona Chats -->
+      <!-- Lessons -->
       <div class="row gx-5 justify-content-center">
         <div class="col-lg-12 align-middle">
           <div class="text-left my-3">
-            <h3 class="display-7 fw-bolder text-dark mb-4">Personas</h3>
-            <!-- <p class="lead text-dark mb-4">Your chance to chat with a famous person.</p> -->
+            <h3 class="display-7 fw-bolder text-dark mb-4">Lessons</h3>
+            <!-- <p class="lead text-dark mb-4">Learn the alphabet, vocabulary and more.</p> -->
           </div>
         </div>
       </div>
-      <!-- Persona Chats Cards -->
+      <!-- Lesson Cards -->
       <div class="row gx-4 px-0 mb-3 justify-content-left">
         {% for prompt_key, prompt_data in prompts.items() %}
-          {% if prompt_data['category']=='persona' %}
+          {% if prompt_data['category']=='lesson' %}
             <div class="col-lg-4 mb-5 mb-lg-0">
               <div class="card chat-preview-card text-dark mb-3" style="max-width: 18rem;">
-                <div class="card-header bg-persona-header bg-gradient">Persona</div>
-                <div class="card-body bg-persona-body bg-gradient">
+                <div class="card-header bg-lesson-header bg-gradient">Lesson</div>
+                <div class="card-body bg-lesson-body bg-gradient">
                   <h5 class="card-title">{{ prompt_data['label'] }}</h5>
                   <p class="card-text">{{ prompt_data['description_short'] }}</p>
                   <a href="{{ url_for('chat.chat', chat_scenario=prompt_key) }}" class="stretched-link"></a>

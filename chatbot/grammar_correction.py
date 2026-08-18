@@ -11,7 +11,6 @@ class GrammarModel(Gramformer):
     def __init__(self, models=1, use_gpu=False, seed=1212):
         self.gm = super().__init__(models=1, use_gpu=False)
         self.ignore_errors = ['OTHER', 'ORTH']
-
     def grammar_correction(self,last_user_input):
         """
         Generate a corrected sentence and a message to the user with the correction.

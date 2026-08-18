@@ -19,7 +19,7 @@ def dashboard():
 
 
     featured_prompts = {key: current_app.prompts[key] for key in
-                        ['general_chat_intermediate', 'scenario_restaurant', 'persona_shakespeare']
+                        ['general_chat_intermediate', 'scenario_restaurant', 'lesson_vocabulary']
                         }
         
     return render_template('dashboard/dashboard.html',

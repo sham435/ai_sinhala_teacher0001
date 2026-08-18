@@ -3,9 +3,9 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 from plotly.io import to_html
-from flask.json import JSONEncoder, JSONDecoder
-import flask.json
-import json 
+import json
+from json import JSONEncoder, JSONDecoder
+from flask.json.provider import JSONProvider
 from chatbot.chat import ChatHistory
 
 
@@ -92,6 +92,17 @@ class CustomJSONDecoder(JSONDecoder):
             chat_history_json = obj_json['chat_history']
             obj_json['chat_history'] = ChatHistory.fromJSON(chat_history_json)
         return obj_json
+
+
+class CustomJSONProvider(JSONProvider):
+    """ Flask JSON provider using the custom encoder/decoder so that
+    ChatHistory objects can be stored in the session.
+    """
+    def dumps(self, obj, **kwargs):
+        return CustomJSONEncoder(**kwargs).encode(obj)
+
+    def loads(self, s, **kwargs):
+        return CustomJSONDecoder(**kwargs).decode(s)
 
 def get_empty_chat_history():
     """ Returns a minimal chat history """

@@ -174,8 +174,8 @@ class ChatHistory():
                 for message in messages
                 if not message.correction
             ])
-        # Add a final prompt for the (ie. "Bot:")
-        dialog += f"\nf{self.tag_bot}:"
+        # Add a final prompt for the bot (ie. "Bot:")
+        dialog += f"\n{self.tag_bot}:"
 
         prompt_with_dialog = "\n".join([self.prompt_base, dialog]).lstrip()
         return prompt_with_dialog

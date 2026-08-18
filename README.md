@@ -1,23 +1,22 @@
-# Nova AI
+# AI Sinhala Teacher
 
-![CI](https://github.com/ConvAF/NovaAI/actions/workflows/build.pipeline.yml/badge.svg)
+![CI](https://github.com/sham435/ai_sinhala_teacher0001/actions/workflows/build.pipeline.yml/badge.svg)
 ![Coverage badge](tests/coverage-badge.svg)
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 
 <a href="https://www.loom.com/share/50b3de2c86054ed5a6115247818ab293">
-    <p>See a Loom Demo of NovaAI here</p>
+    <p>See a Loom Demo of AI Sinhala Teacher here</p>
     <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/50b3de2c86054ed5a6115247818ab293-with-play.gif">
   </a>
 
-Try out Nova at:
+Try out AI Sinhala Teacher:
 
-http://nova-ai.net/ (Udpate: no longer active)
-
+https://github.com/sham435/ai_sinhala_teacher0001
 ## Overview
 
-Nova is an application that uses conversational AI for language learning to help users gain fluency in their target language (work in progress).
+AI Sinhala Teacher is an application that uses conversational AI for language learning to help users gain fluency in their target language (work in progress).
 
-Users can chat with Nova, practice specific scenarios, and track their learning progress.
+Users can chat with AkuraAi, practice specific scenarios, and track their learning progress.
 
 Features:
 
@@ -34,8 +33,8 @@ The package uses `python3.9`.
 First clone the repo:
 
 ```bash
-git clone git@github.com:ConvAF/NovaAI.git
-cd chatbot
+git clone https://github.com/sham435/ai_sinhala_teacher0001.git
+cd ai_sinhala_teacher
 ```
 
 It is recommended to also set up and activate a
@@ -95,7 +94,6 @@ flask run
 ```
 
 ## Deployment
-
 ### Deploying on AWS EC2
 
 This describes how to deploy the app on an AWS EC2 instance using docker.
@@ -103,8 +101,8 @@ This describes how to deploy the app on an AWS EC2 instance using docker.
 First clone the repo:
 
 ```bash
-git clone git@github.com:ConvAF/NovaAI.git
-cd chatbot
+git clone https://github.com/sham435/ai_sinhala_teacher0001.git
+cd ai_sinhala_teacher
 ```
 
 Then build the image using
@@ -112,6 +110,7 @@ Then build the image using
 ```bash
 docker build . --tag chatbot
 ```
+
 
 To run the app (and keep running in background), start the container as
 

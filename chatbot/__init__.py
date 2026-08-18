@@ -1,5 +1,6 @@
 import os
 import json
+import secrets
 from pathlib import Path
 from dotenv import load_dotenv
 from flask import Flask, render_template, session
@@ -16,8 +17,24 @@ def create_app(test_config=None):
     """
     # create and configure the app instance
     app = Flask(__name__, instance_relative_config=True)
+
+    # Read SECRET_KEY from env, otherwise generate and persist one so
+    # sessions survive restarts.
+    secret_key = os.getenv('SECRET_KEY')
+    if not secret_key:
+        secret_file = Path(app.instance_path) / 'secret_key'
+        if secret_file.exists():
+            secret_key = secret_file.read_text().strip()
+        else:
+            secret_key = secrets.token_hex(32)
+            try:
+                os.makedirs(app.instance_path)
+                secret_file.write_text(secret_key)
+            except OSError:
+                pass  # fall back to a per-process secret
+
     app.config.from_mapping(
-        SECRET_KEY='dev',
+        SECRET_KEY=secret_key,
         DATABASE=os.path.join(app.instance_path, 'chatbot.sqlite'),
         LOAD_GRAMMAR_MODEL=True
     )
@@ -36,9 +53,12 @@ def create_app(test_config=None):
         pass
 
     # Ensure required environment vars exist
-    env_vars = ['OPENAI_API_KEY', 'OPENAI_ENGINE']
-    for var in env_vars:
-        assert os.getenv(var)
+    missing_env_vars = [var for var in ('OPENAI_API_KEY', 'OPENAI_ENGINE') if not os.getenv(var)]
+    if missing_env_vars:
+        raise RuntimeError(
+            f"Missing required environment variables: {', '.join(missing_env_vars)}. "
+            "Set them in the .env file."
+        )
 
     # Initialize the database
     db.init_app(app)
@@ -60,13 +80,13 @@ def create_app(test_config=None):
         app.grammar_correction = GrammarModel(models = 1, use_gpu=False)
 
     # Load prompts data
-    prompts_path = Path(app.root_path) / 'data'/ 'prompts.json'
-    app.prompts = json.loads(open(prompts_path,'r').read())
+    prompts_path = Path(app.root_path) / 'data' / 'prompts.json'
+    with open(prompts_path, 'r', encoding='utf-8') as f:
+        app.prompts = json.load(f)
 
 
-    from chatbot.utils import CustomJSONDecoder, CustomJSONEncoder
-    app.json_encoder = CustomJSONEncoder
-    app.json_decoder = CustomJSONDecoder
+    from chatbot.utils import CustomJSONProvider
+    app.json_provider_class = CustomJSONProvider
 
 
     return app

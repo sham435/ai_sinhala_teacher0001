@@ -45,6 +45,7 @@ html {
   --general-chat-rgb: var(--yellow-sunglow);
   --scenario-rgb: var(--red-light-coral);
   --persona-rgb: var(--tiffany-blue);
+  --lesson-rgb: var(--green-mountain-meadow);
 
   /* --red-rgb: 255, 157, 107; */
   --bg-card-header-opacity: 0.75;
@@ -123,6 +124,20 @@ html {
 .bg-persona-body {
   background-color: rgba(
     var(--persona-rgb),
+    var(--bg-card-body-opacity)
+  ) !important;
+}
+
+.bg-lesson-header {
+  background-color: rgba(
+    var(--lesson-rgb),
+    var(--bg-card-header-opacity)
+  ) !important;
+}
+
+.bg-lesson-body {
+  background-color: rgba(
+    var(--lesson-rgb),
     var(--bg-card-body-opacity)
   ) !important;
 }
