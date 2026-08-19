@@ -1,36 +1,36 @@
 import os
-import openai
-import json
-from pathlib import Path
-from flask import current_app
+import requests
 
 from chatbot.chat import ChatHistory
 
-ENGINES = {
-    'ada': 'text-ada-001',
-    'babbage': 'text-babbage-001',
-    'curie': 'text-curie-001',
-    'davinci': 'text-davinci-002'
-}
 
 class LanguageModel():
-    """ Language Generation Model
+    """ Language Generation Model backed by OpenRouter (free models).
     """
-    def __init__(self):
 
-        # Init openai
-        openai.api_key = os.getenv("OPENAI_API_KEY")
-        self.engine = os.getenv("OPENAI_ENGINE")
+    def __init__(self):
+        # OpenCode Zen is the default provider; OpenRouter is used if only
+        # an OpenRouter key is configured.
+        self.zen_key = os.getenv("OPENCODE_API_KEY", "")
+        self.openrouter_key = os.getenv("OPENROUTER_API_KEY", "")
+        self.model = (
+            os.getenv("OPENCODE_MODEL", "")
+            or os.getenv("OPENROUTER_MODEL", "")
+            or "deepseek-v4-flash-free"
+        )
         self.temperature = 0.5
         self.max_tokens = 120
-        
+
+        if self.openrouter_key and not self.zen_key:
+            self.base_url = "https://openrouter.ai/api/v1/chat/completions"
+            self.api_key = self.openrouter_key
+        else:
+            self.base_url = "https://opencode.ai/zen/v1/chat/completions"
+            self.api_key = self.zen_key
 
     def add_response_to_chat_history(self, chat_history: ChatHistory):
         """ Generate a response from the bot and append to chat history.
         """
-        # if chat_history is None or len(chat_history)==0:
-        #     return chat_history
-        
         reply_raw_text = self.get_response_from_GPT3(chat_history)
 
         reply_text = self.clean_reply_text(reply_raw_text,
@@ -42,34 +42,57 @@ class LanguageModel():
             chat_history.add_bot_message(reply_text)
         return chat_history
 
+    def build_messages(self, chat_history: ChatHistory):
+        """ Convert the chat history into chat-completion messages.
+        """
+        messages = [{"role": "system", "content": chat_history.prompt_base}]
+        for message in chat_history.messages:
+            if message.correction:
+                continue
+            role = "user" if message.sender == "user" else "assistant"
+            messages.append({"role": role, "content": message.text})
+        return messages
 
     def get_response_from_GPT3(self, chat_history):
-        """ Get a reply from GPT3 
-        
+        """ Get a reply from the language model via OpenRouter.
+
         Returns:
         --------
          - reply: str
             A text string containing just the reply from the model.
             Example: "I'm fine, how are you?"
         """
-        # prompt_with_dialog = self.create_prompt_with_dialog(chat_history, prompt_text)
-        prompt_with_dialog = chat_history.get_as_prompt_with_dialog()
+        if not self.api_key:
+            return "I can't respond right now - no OPENCODE_API_KEY is configured."
 
-        # Add the stop sequences (such as "Human:" and "AkuraAi:")
-        # stop_sequences = [f'{tag}:' for tag in [chat_history.tag_user, chat_history.tag_bot]]
-        stop_sequences = [f'{tag}:' for tag in [chat_history.tag_user]]
+        payload = {
+            "model": self.model,
+            "messages": self.build_messages(chat_history),
+            "temperature": self.temperature,
+            "max_tokens": self.max_tokens,
+        }
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
 
-        response = openai.Completion.create(
-                engine=self.engine,
-                prompt=prompt_with_dialog,
-                temperature=self.temperature,
-                max_tokens=self.max_tokens,
-                stop=stop_sequences
-            )
+        try:
+            response = requests.post(self.base_url, headers=headers, json=payload, timeout=60)
+        except requests.RequestException as exc:
+            return f"I couldn't reach the model service right now: {exc}"
 
-        if response and ('choices' in response) and len(response['choices']):
-            reply_raw = response['choices'][0]['text']
-            return reply_raw
+        if response.status_code != 200:
+            detail = "unknown error"
+            try:
+                detail = response.json().get('error', {}).get('message', detail)
+            except ValueError:
+                detail = response.text[:200]
+            return f"The model service returned an error: {detail}"
+
+        data = response.json()
+        choices = data.get('choices', [])
+        if choices:
+            return choices[0]['message']['content']
 
         return ''
 

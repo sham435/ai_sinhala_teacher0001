@@ -53,7 +53,13 @@ def create_app(test_config=None):
         pass
 
     # Ensure required environment vars exist
-    missing_env_vars = [var for var in ('OPENAI_API_KEY', 'OPENAI_ENGINE') if not os.getenv(var)]
+    # A key for either provider is required; OpenCode Zen free models also
+    # work without one (rate-limited).
+    missing_env_vars = []
+    if not (os.getenv('OPENCODE_API_KEY') or os.getenv('OPENROUTER_API_KEY') or os.getenv('OPENAI_API_KEY')):
+        missing_env_vars.append('OPENCODE_API_KEY/OPENROUTER_API_KEY/OPENAI_API_KEY')
+    if not os.getenv('OPENAI_ENGINE') and not os.getenv('OPENCODE_MODEL') and not os.getenv('OPENROUTER_MODEL'):
+        missing_env_vars.append('OPENCODE_MODEL')
     if missing_env_vars:
         raise RuntimeError(
             f"Missing required environment variables: {', '.join(missing_env_vars)}. "
