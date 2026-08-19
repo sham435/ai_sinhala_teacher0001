@@ -6,3 +6,15 @@ CREATE TABLE user (
   email TEXT UNIQUE NOT NULL,
   password TEXT NOT NULL
 );
+
+DROP TABLE IF EXISTS chat_message;
+
+CREATE TABLE chat_message (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  scenario TEXT NOT NULL,
+  sender TEXT NOT NULL,
+  text TEXT NOT NULL,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES user (id)
+);

@@ -1,12 +1,13 @@
 """
 Chat views.
 """
-from flask import Blueprint, render_template, request, session, current_app, abort
+from flask import Blueprint, render_template, request, session, current_app, abort, g
 from wtforms import Form, StringField, validators
 import json, copy
 from random import choice
 
 from chatbot.auth import login_required
+from chatbot.db import get_db
 
 # Create a blueprint for authentication
 bp = Blueprint('chat', __name__, url_prefix='/chat')
@@ -56,6 +57,7 @@ def chat(chat_scenario):
             clear_chat_history()
         elif request.form['submit_button'] == 'Send' and form.validate():
             # Add text to chat history
+            n_messages_before = len(chat_history.messages)
             chat_history.add_user_message(form.text_input.data)
             # Clear form
             form.text_input.data = ""
@@ -63,6 +65,8 @@ def chat(chat_scenario):
             chat_history = get_bot_response(chat_history)
             # Update chat history
             session['chat_history'] = chat_history
+            # Persist the new messages for progress tracking
+            record_chat_messages(chat_scenario, chat_history, from_index=n_messages_before)
 
 
     return render_template('chat/chat.html', 
@@ -89,6 +93,23 @@ def clear_chat_history():
     """ Clear the chat history """
     if session.get('chat_history'):
         session.pop('chat_history')
+
+
+def record_chat_messages(chat_scenario, chat_history, from_index=0):
+    """ Persist the messages added since ``from_index`` for progress tracking.
+
+    Uses the currently logged in user from ``g``; silently skips if no user.
+    """
+    if g.user is None:
+        return
+    db = get_db()
+    for message in chat_history.messages[from_index:]:
+        db.execute(
+            "INSERT INTO chat_message (user_id, scenario, sender, text) "
+            "VALUES (?, ?, ?, ?)",
+            (g.user['id'], chat_scenario, message.sender, message.text),
+        )
+    db.commit()
 
 
 class ChatMessage():

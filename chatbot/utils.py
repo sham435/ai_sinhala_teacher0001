@@ -1,28 +1,36 @@
 import plotly.express as px
 import pandas as pd
 import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from plotly.io import to_html
 import json
 from json import JSONEncoder, JSONDecoder
+from flask import current_app
 from flask.json.provider import JSONProvider
 from chatbot.chat import ChatHistory
+from chatbot.db import get_db
 
 
-def get_activity_plot():
-    """ Returns a plot of the users activity over time
+def get_activity_plot(user_id: int):
+    """ Returns a plot of the user's chat activity over the last 14 days.
     """
 
-    def get_daily_chat_data():
-        today = datetime.today()
-        date_range = pd.date_range(today-timedelta(days=14), today)
-        chats = [0,1,5,4,0,3,2,3,0,2,0,1,3,2,4]
-        data = pd.DataFrame({'date': date_range, 'chats': chats})
-        return data
+    db = get_db()
+    rows = db.execute(
+        """SELECT date(created_at) AS day, COUNT(*) AS n
+           FROM chat_message
+           WHERE user_id = ? AND created_at >= datetime('now', '-13 days')
+           GROUP BY day""",
+        (user_id,)
+    ).fetchall()
+    counts = {r['day']: r['n'] for r in rows}
 
-    data = get_daily_chat_data()
+    date_range = pd.date_range(datetime.now(timezone.utc) - timedelta(days=13), datetime.now(timezone.utc))
+    data = pd.DataFrame({'date': date_range})
+    data['chats'] = data['date'].dt.strftime('%Y-%m-%d').map(counts).fillna(0).astype(int)
+
     fig = px.bar(data, x='date', y='chats', height=300,
-                labels={'chats': 'chats', 'date': ''}
+                labels={'chats': 'messages', 'date': ''}
                 )
     fig.data[0].marker.color = '#17C3B2'
     fig.update_traces(
@@ -34,24 +42,78 @@ def get_activity_plot():
     return fig_html
 
 
-def get_error_distribution_plot():
-    """ Returns a plot of the users grammar error distribution
+def get_practice_distribution_plot(user_id: int):
+    """ Returns a donut chart of the user's messages per chat scenario.
+
+    Returns None if the user has no recorded activity yet.
     """
-    error_data = pd.DataFrame({
-        'error_labels': ['verbs', 'adjectives', 'adverbs', 'nouns', 'prepositions', 'other'],
-        'amount': [30,21,14,8,5,4]
+    db = get_db()
+    rows = db.execute(
+        """SELECT scenario, COUNT(*) AS amount
+           FROM chat_message
+           WHERE user_id = ?
+           GROUP BY scenario
+           ORDER BY amount DESC""",
+        (user_id,)
+    ).fetchall()
+
+    if not rows:
+        return None
+
+    prompts = current_app.prompts
+    data = pd.DataFrame({
+        'scenario': [prompts.get(r['scenario'], {}).get('label', r['scenario']) for r in rows],
+        'amount': [r['amount'] for r in rows],
     })
-    fig = px.pie(error_data, values='amount', names='error_labels',
-            #title='Types of errors',
-                color_discrete_sequence=px.colors.sequential.GnBu)
+    fig = px.pie(data, values='amount', names='scenario', hole=0.4,
+                 color_discrete_sequence=px.colors.sequential.GnBu)
 
     fig.update_traces(
-        hoverinfo='none',
+        hoverinfo='label+value',
         hovertemplate=None
     )
 
     fig_html = to_html(fig, full_html=False, include_plotlyjs=False, config={"displayModeBar": False})
     return fig_html
+
+
+def get_user_stats(user_id: int):
+    """ Returns real usage statistics for a user. """
+    db = get_db()
+    total_messages = db.execute(
+        "SELECT COUNT(*) AS n FROM chat_message WHERE user_id = ?", (user_id,)
+    ).fetchone()['n']
+    total_chats = db.execute(
+        "SELECT COUNT(DISTINCT scenario) AS n FROM chat_message WHERE user_id = ?", (user_id,)
+    ).fetchone()['n']
+
+    day_rows = db.execute(
+        "SELECT DISTINCT date(created_at) AS day FROM chat_message "
+        "WHERE user_id = ? ORDER BY day",
+        (user_id,)
+    ).fetchall()
+    streak = compute_streak([r['day'] for r in day_rows])
+
+    return {
+        'total_messages': total_messages,
+        'total_chats': total_chats,
+        'streak': streak,
+    }
+
+
+def compute_streak(day_strings):
+    """ Count consecutive days of activity ending today (or yesterday). """
+    if not day_strings:
+        return 0
+    day_set = set(day_strings)
+    cursor = datetime.now(timezone.utc).date()
+    if cursor.isoformat() not in day_set:
+        cursor = cursor - timedelta(days=1)
+    streak = 0
+    while cursor.isoformat() in day_set:
+        streak += 1
+        cursor = cursor - timedelta(days=1)
+    return streak
 
 
 class CustomJSONEncoder(JSONEncoder):

@@ -12,7 +12,7 @@
               <h3 class="display-5 fw-bolder text-dark mb-2">Hi {{ g.user['name'] }}!</h3>
             </div>
               <div class="text-left my-2">
-                  <p class="lead text-dark-50 mb-4">Looks like you're on fire:<br>You have a streak of 4 days 🔥<i class="bi bi-emoji-fire"></i><br>Keep it going!</p>                  
+                  <p class="lead text-dark-50 mb-4">Looks like you're on fire:<br>You have a streak of {{ stats['streak'] }} days 🔥<i class="bi bi-emoji-fire"></i><br>You've sent {{ stats['total_messages'] }} messages across {{ stats['total_chats'] }} chats.<br>Keep it going!</p>                  
               </div>
               <div class="d-grid gap-3 d-sm-flex justify-content-sm-left">
                 <a class="btn btn-outline-secondary btn-md px-4 me-sm-3" href="{{ url_for('dashboard.statistics') }}">Go to Learning Statistics</a>

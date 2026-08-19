@@ -1,10 +1,10 @@
 """
 Dashboard view.
 """
-from flask import Blueprint, render_template, current_app
+from flask import Blueprint, render_template, current_app, g
 
 from chatbot.auth import login_required
-from chatbot.utils import get_activity_plot, get_error_distribution_plot
+from chatbot.utils import get_activity_plot, get_practice_distribution_plot, get_user_stats
 
 # Create a blueprint for authentication
 bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
@@ -15,8 +15,7 @@ def dashboard():
     """ Route for the user dashboard
     """
 
-    fig_activity_html = get_activity_plot()
-
+    fig_activity_html = get_activity_plot(g.user['id'])
 
     featured_prompts = {key: current_app.prompts[key] for key in
                         ['general_chat_intermediate', 'scenario_restaurant', 'lesson_vocabulary']
@@ -24,7 +23,8 @@ def dashboard():
         
     return render_template('dashboard/dashboard.html',
                             plot=fig_activity_html,
-                            featured_prompts=featured_prompts
+                            featured_prompts=featured_prompts,
+                            stats=get_user_stats(g.user['id'])
                             )
 
 
@@ -35,9 +35,9 @@ def statistics():
     """ Route for the user learning center
     """
 
-    fig_activity_html = get_activity_plot()
+    fig_activity_html = get_activity_plot(g.user['id'])
 
-    fig_grammar_html = get_error_distribution_plot()
+    fig_practice_html = get_practice_distribution_plot(g.user['id'])
 
     # suggested_prompts = 
     suggested_prompts = {key: current_app.prompts[key] for key in
@@ -46,7 +46,8 @@ def statistics():
         
     return render_template('dashboard/statistics.html', 
                             plot_activity=fig_activity_html,
-                            plot_grammar=fig_grammar_html,
-                            suggested_prompts=suggested_prompts
+                            plot_grammar=fig_practice_html,
+                            suggested_prompts=suggested_prompts,
+                            stats=get_user_stats(g.user['id'])
                             )
 

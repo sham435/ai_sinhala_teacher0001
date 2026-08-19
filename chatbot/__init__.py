@@ -87,6 +87,7 @@ def create_app(test_config=None):
 
     from chatbot.utils import CustomJSONProvider
     app.json_provider_class = CustomJSONProvider
+    app.json = CustomJSONProvider(app)
 
 
     return app
