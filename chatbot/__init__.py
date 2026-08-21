@@ -36,7 +36,7 @@ def create_app(test_config=None):
     app.config.from_mapping(
         SECRET_KEY=secret_key,
         DATABASE=os.path.join(app.instance_path, 'chatbot.sqlite'),
-        LOAD_GRAMMAR_MODEL=True
+        LOAD_GRAMMAR_MODEL=os.getenv('LOAD_GRAMMAR_MODEL', 'True').lower() in ('1', 'true', 'yes', 'on')
     )
 
     if test_config is None:
